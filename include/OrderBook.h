@@ -12,6 +12,7 @@ class OrderBook {
         std::map<double, std::deque<Order>> sellOrders;
     public:
         void addOrder(const Order& order);
+        bool cancelOrder(std::uint64_t orderId);
         void printBuyBook() const;
         void printSellBook() const;
         void printOrderBook() const;

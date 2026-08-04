@@ -19,7 +19,7 @@ int main() {
     book.addOrder(sellOrder1);
     book.addOrder(sellOrder2);
     book.addOrder(sellOrder3);
- 
+    book.cancelOrder(5);
     book.printOrderBook();
 
 
