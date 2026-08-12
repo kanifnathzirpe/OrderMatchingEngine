@@ -40,6 +40,7 @@ class Order {
         double getPrice() const;
         std::uint32_t getQuantity() const;
         std::uint64_t getTimestamp() const;
+        void reduceQuantity(std::uint32_t amount);
 };
     
     

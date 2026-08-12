@@ -38,3 +38,11 @@ std::uint32_t Order::getQuantity() const {
 std::uint64_t Order::getTimestamp() const {
     return timestamp;
 }
+
+void Order::reduceQuantity(std::uint32_t amount) {
+    if(amount >= quantity) {
+        quantity = 0;
+    } else {
+        quantity -= amount;
+    }
+}
