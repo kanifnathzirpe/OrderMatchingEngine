@@ -26,6 +26,7 @@ class OrderBook {
         void addOrder(const Order& order);
         bool cancelOrder(std::uint64_t orderId);
         void matchOrder(Order& incomingOrder);
+        std::size_t getTradeCount() const;
 
         void printTrades() const;
         void printBuyBook() const;

@@ -131,6 +131,10 @@ void OrderBook::matchOrder(Order& incomingOrder) {
     }
 }
 
+std::size_t OrderBook::getTradeCount() const {
+    return trades.size();
+}
+
 void OrderBook::printTrades() const {
     std::cout << "\n========== TRADE HISTORY ==========\n";
 

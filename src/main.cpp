@@ -1,29 +1,47 @@
 #include "Order.h"
 #include "OrderBook.h"
+#include <iostream>
+#include <chrono>
+#include <random>
+#include <vector>
 
 
 int main() {
     OrderBook book;
-    //id,side,type,price,quantity,timestamp
-    Order buyOrder1(1, OrderSide::Buy, OrderType::Limit, 101.50, 100, 1690000000);
-    Order buyOrder2(2, OrderSide::Buy, OrderType::Limit, 102.00, 50, 1690000001);
-    Order buyOrder3(3, OrderSide::Buy, OrderType::Limit, 101.50, 25, 1690000002);
- 
-    Order sellOrder1(4, OrderSide::Sell, OrderType::Limit, 100.00, 75, 1690000003);
-    Order sellOrder2(5, OrderSide::Sell, OrderType::Market, 102.75, 50, 1690000004);
-    Order sellOrder3(6, OrderSide::Sell, OrderType::Limit, 101.00, 20, 1690000005);
- 
-    book.addOrder(buyOrder1);
-    book.addOrder(sellOrder1);
-    book.addOrder(buyOrder2);
-    book.addOrder(buyOrder3);
-    book.addOrder(sellOrder2);
-    book.addOrder(sellOrder3);
-    book.cancelOrder(2);
-    book.printOrderBook();
+    std::mt19937 rng(42);
+    std::uniform_real_distribution<double> priceDist(95.0,105.0);
+    std::uniform_int_distribution<int> quantityDist(1,100);
+    std::uniform_int_distribution<int> sideDist(0,1);
+    std::uniform_int_distribution<int> typeDist(0,1);
+    
+    const int NUM_ORDERS = 1000000;
+    auto start = std::chrono::high_resolution_clock::now();
+    for(int i=1;i<=NUM_ORDERS;i++) {
+        OrderSide side = (sideDist(rng)==0)? OrderSide::Buy : OrderSide::Sell;
+        OrderType type = (typeDist(rng)==0)? OrderType::Limit : OrderType::Market;
+
+        double price = priceDist(rng);
+        int quantity = quantityDist(rng);
+
+        Order order(i, side, type, price, quantity,i);
+        book.addOrder(order);
+    }
 
     
-    book.printTrades();
+    
+    
+    auto end = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
+    double executionTimeSeconds = duration.count() / 1'000'000.0;
+    double ordersPerSecond = NUM_ORDERS / executionTimeSeconds;
+
+    
+    std::cout << "\n========== PERFORMANCE ==========\n";
+    std::cout << "Orders Processed : " << NUM_ORDERS << '\n';
+    std::cout << "Trades Executed  : " << book.getTradeCount() << '\n';
+    std::cout << "Execution Time   : " << duration.count() << " microseconds\n";
+    std::cout << "Throughput   : " << ordersPerSecond << " orders/sec\n";
 
     return 0;
 }
