@@ -3,18 +3,21 @@
 #include <iostream>
 #include <algorithm>
 
-void OrderBook::addOrder(const Order& order) {
-    Order incomingOrder = order;
-    matchOrder(incomingOrder);
-    if(incomingOrder.getQuantity()==0) return;
-    const double price = incomingOrder.getPrice();
+void OrderBook::addOrder(Order order) {
+    matchOrder(order);
+    if(order.getQuantity()==0) return;
+    const auto price = order.getPrice();
     
-    if(incomingOrder.getSide()==OrderSide::Buy) {
-        buyOrders[price].push_back(incomingOrder);
-        orderIndex[incomingOrder.getOrderId()] = {price, OrderSide::Buy};
+    if(order.getSide()==OrderSide::Buy) {
+        auto& orders = buyOrders[price];
+        orders.push_back(order);
+        auto orderIt = std::prev(orders.end());
+        orderIndex[order.getOrderId()] = {price, OrderSide::Buy, orderIt};
     } else {
-        sellOrders[price].push_back(incomingOrder);
-        orderIndex[incomingOrder.getOrderId()] = {price, OrderSide::Sell};
+        auto& orders = sellOrders[price];
+        orders.push_back(order);
+        auto orderIt = std::prev(orders.end());
+        orderIndex[order.getOrderId()] = {price, OrderSide::Sell, orderIt};
     }
 }
 
@@ -23,44 +26,31 @@ bool OrderBook::cancelOrder(std::uint64_t orderId) {
 
     if(indexIt==orderIndex.end()) return false;
     
-    const double price = indexIt->second.price;
-    const OrderSide side = indexIt->second.side;
+    const auto price = indexIt->second.price;
+    const auto side = indexIt->second.side;
+    auto orderIt = indexIt->second.orderIt;
 
     if(side==OrderSide::Buy) {
         auto priceIt = buyOrders.find(price);
         if(priceIt!=buyOrders.end()) {
-            std::deque<Order>& orders = priceIt->second;
-
-            for(auto orderIt=orders.begin(); orderIt!=orders.end(); ++orderIt) {
-                if(orderIt->getOrderId()==orderId) {
-                    orders.erase(orderIt);
-                    if(orders.empty()) {
-                        buyOrders.erase(price);
-                    }
-                    orderIndex.erase(indexIt);
-                    return true;
-                }
+            priceIt->second.erase(orderIt);
+            if(priceIt->second.empty()) {
+                buyOrders.erase(priceIt);
             }
+            
         }
     }
     else {
         auto priceIt = sellOrders.find(price);
         if(priceIt!=sellOrders.end()) {
-            std::deque<Order>& orders = priceIt->second;
-    
-            for(auto orderIt=orders.begin(); orderIt!=orders.end(); ++orderIt) {
-                if(orderIt->getOrderId()==orderId) {
-                    orders.erase(orderIt);
-                    if(orders.empty()) {
-                        sellOrders.erase(price);
-                    }
-                    orderIndex.erase(indexIt);
-                    return true;
-                }
+            priceIt->second.erase(orderIt);
+            if(priceIt->second.empty()) {
+                sellOrders.erase(priceIt);
             }
         }
     }
-    return false;
+    orderIndex.erase(indexIt);
+    return true;
 }
 
 void OrderBook::matchOrder(Order& incomingOrder) {
@@ -73,7 +63,7 @@ void OrderBook::matchOrder(Order& incomingOrder) {
                 break;
             }
             
-            std::deque<Order>& orders = bestSell->second;
+            auto& orders = bestSell->second;
             Order& restingOrder = orders.front();
 
             const std::uint32_t tradeQuantity = std::min(incomingOrder.getQuantity(),restingOrder.getQuantity());
@@ -101,7 +91,7 @@ void OrderBook::matchOrder(Order& incomingOrder) {
             auto bestBuy = buyOrders.begin();
             const double buyPrice = bestBuy->first;
             
-            std::deque<Order>& orders = bestBuy->second;
+            auto& orders = bestBuy->second;
             Order& restingOrder = orders.front();
             
             if(incomingOrder.getType()==OrderType::Limit && buyPrice < incomingOrder.getPrice()) {

@@ -3,7 +3,7 @@
 
 #include "Order.h"
 #include "Trade.h"
-#include <deque>
+#include <list>
 #include <vector>
 #include <map>
 #include <unordered_map>
@@ -13,17 +13,18 @@
 struct OrderLocation { 
     double price;
     OrderSide side;
+    std::list<Order>::iterator orderIt;
 };
 
 class OrderBook {
     private:
-        std::map<double, std::deque<Order>, std::greater<double>> buyOrders;
-        std::map<double, std::deque<Order>> sellOrders;
+        std::map<double, std::list<Order>, std::greater<double>> buyOrders;
+        std::map<double, std::list<Order>> sellOrders;
         std::unordered_map<std::uint64_t, OrderLocation> orderIndex;
         std::vector<Trade> trades;
 
     public:
-        void addOrder(const Order& order);
+        void addOrder(Order order);
         bool cancelOrder(std::uint64_t orderId);
         void matchOrder(Order& incomingOrder);
         std::size_t getTradeCount() const;
