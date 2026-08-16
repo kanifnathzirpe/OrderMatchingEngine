@@ -67,6 +67,7 @@ BenchmarkResult runBenchmark(int NUM_ORDERS) {
 }
 
 int main() {
+    std::cout<<sizeof(Order)<<std::endl;
     constexpr int NUM_ORDERS = 1'000'000;
     constexpr int NUM_RUNS = 5;
     std::vector<BenchmarkResult> results;
