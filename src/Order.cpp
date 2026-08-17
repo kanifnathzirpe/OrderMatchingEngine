@@ -46,3 +46,15 @@ void Order::reduceQuantity(std::uint32_t amount) {
         quantity -= amount;
     }
 }
+
+void Order::setPrice(double newPrice) {
+    price = newPrice;
+}
+
+void Order::setQuantity(std::uint32_t newQuantity) {
+    quantity = newQuantity;
+}
+
+void Order::setTimestamp(std::uint64_t newTimestamp) {
+    timestamp = newTimestamp;
+}

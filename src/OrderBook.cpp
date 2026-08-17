@@ -53,6 +53,24 @@ bool OrderBook::cancelOrder(std::uint64_t orderId) {
     return true;
 }
 
+bool OrderBook::modifyOrder(std::uint64_t orderId, double newPrice, std::uint32_t newQuantity) {
+    if(newPrice <= 0 || newQuantity==0) return false;
+    auto indexIt = orderIndex.find(orderId);
+    if(indexIt==orderIndex.end()) return false;
+    
+    const auto& entry = indexIt->second;
+    Order modifiedOrder = *(entry.orderIt);
+
+    cancelOrder(orderId);
+
+    modifiedOrder.setPrice(newPrice);
+    modifiedOrder.setQuantity(newQuantity);
+    modifiedOrder.setTimestamp(modifiedOrder.getTimestamp()+1);
+
+    addOrder(modifiedOrder);
+    return true;
+} 
+
 void OrderBook::matchOrder(Order& incomingOrder) {
     if(incomingOrder.getSide()==OrderSide::Buy) {
         while(incomingOrder.getQuantity()>0 && !sellOrders.empty()) {
