@@ -6,9 +6,18 @@
     {}
 
 void Order::display() const {
+    std::string orderType;
+
+    if (type == OrderType::Limit)
+        orderType = "Limit";
+    else if (type == OrderType::Market)
+        orderType = "Market";
+    else
+        orderType = "IOC";
+        
     std::cout<<"Order ID: " << orderId
             <<" | Side: " << (side==OrderSide::Buy? "Buy":"Sell")
-            <<" | Type: " << (type==OrderType::Limit? "Limit":"Market")
+            <<" | Type: " << orderType
             <<" | Price: " << price
             <<" | Quantity: " << quantity
             <<" | Timestamp: " << timestamp

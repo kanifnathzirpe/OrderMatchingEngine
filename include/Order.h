@@ -10,7 +10,8 @@ enum class OrderSide {
 
 enum class OrderType {
     Limit,
-    Market
+    Market,
+    IOC
 };
 
 class Order {

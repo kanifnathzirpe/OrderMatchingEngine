@@ -6,6 +6,7 @@
 void OrderBook::addOrder(Order order) {
     matchOrder(order);
     if(order.getQuantity()==0) return;
+    if(order.getType()==OrderType::IOC) return;
     const auto price = order.getPrice();
     
     if(order.getSide()==OrderSide::Buy) {
@@ -77,7 +78,7 @@ void OrderBook::matchOrder(Order& incomingOrder) {
             auto bestSell = sellOrders.begin();
             const double sellPrice = bestSell->first;
 
-            if(incomingOrder.getType()==OrderType::Limit && sellPrice > incomingOrder.getPrice()) {
+            if((incomingOrder.getType()==OrderType::Limit || incomingOrder.getType()==OrderType::IOC) && sellPrice > incomingOrder.getPrice()) {
                 break;
             }
             
@@ -112,7 +113,7 @@ void OrderBook::matchOrder(Order& incomingOrder) {
             auto& orders = bestBuy->second;
             Order& restingOrder = orders.front();
             
-            if(incomingOrder.getType()==OrderType::Limit && buyPrice < incomingOrder.getPrice()) {
+            if((incomingOrder.getType()==OrderType::Limit || incomingOrder.getType()==OrderType::IOC) && buyPrice < incomingOrder.getPrice()) {
                 break;
             }
             

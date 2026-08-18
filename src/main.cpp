@@ -10,24 +10,12 @@
 int main() {
     OrderBook book;
 
-    book.addOrder(Order(1, OrderSide::Buy, OrderType::Limit, 100.0, 10, 1));
-    book.addOrder(Order(2, OrderSide::Sell, OrderType::Limit, 105.0, 5, 2));
+    book.addOrder(Order(1, OrderSide::Sell, OrderType::Limit, 105.0, 100, 1));
 
-    std::cout << "===== BEFORE MODIFY =====\n";
+    book.addOrder(Order(2, OrderSide::Buy, OrderType::IOC, 100.0, 50, 2));
+
     book.printOrderBook();
-
-    bool modified = book.modifyOrder(999, 100, 10);
-
-    std::cout << "\nModify Success: "
-              << (modified ? "YES" : "NO")
-              << "\n\n";
-
-    std::cout << "===== AFTER MODIFY =====\n";
-    book.printOrderBook();
-
-    std::cout << "\n";
     book.printTrades();
-
 
     return 0;
 }
