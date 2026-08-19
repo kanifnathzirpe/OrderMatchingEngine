@@ -4,9 +4,14 @@
 #include <algorithm>
 
 void OrderBook::addOrder(Order order) {
+    if(order.getType()==OrderType::FOK && !canFullyMatch(order)) return;
     matchOrder(order);
     if(order.getQuantity()==0) return;
-    if(order.getType()==OrderType::IOC) return;
+    if(order.getType()==OrderType::IOC || 
+        order.getType()==OrderType::Market || 
+        order.getType()==OrderType::FOK) {
+            return;
+    }
     const auto price = order.getPrice();
     
     if(order.getSide()==OrderSide::Buy) {
@@ -71,6 +76,36 @@ bool OrderBook::modifyOrder(std::uint64_t orderId, double newPrice, std::uint32_
     addOrder(modifiedOrder);
     return true;
 } 
+
+bool OrderBook::canFullyMatch(const Order& order) const {
+    std::uint32_t remaining = order.getQuantity();
+    if(order.getSide()==OrderSide::Buy) {
+        for(const auto& [price,orders] : sellOrders) {
+            if((order.getType() == OrderType::Limit ||
+                order.getType() == OrderType::IOC ||
+                order.getType() == OrderType::FOK) && price > order.getPrice()) {
+                    break;
+            }
+            for(const auto& restingOrder : orders) {
+                if(remaining <= restingOrder.getQuantity()) return true;
+                remaining -= restingOrder.getQuantity();
+            }
+        }
+    } else {
+        for(const auto& [price, orders] : buyOrders) {
+            if((order.getType() == OrderType::Limit ||
+                order.getType() == OrderType::IOC ||
+                order.getType() == OrderType::FOK) && price < order.getPrice()) {
+                    break;
+            }
+            for(const auto& restingOrder : orders) {
+                if(remaining <= restingOrder.getQuantity()) return true;
+                remaining -= restingOrder.getQuantity();
+            }
+        }
+    }
+    return false;
+}
 
 void OrderBook::matchOrder(Order& incomingOrder) {
     if(incomingOrder.getSide()==OrderSide::Buy) {

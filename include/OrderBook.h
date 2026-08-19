@@ -22,12 +22,13 @@ class OrderBook {
         std::map<double, std::list<Order>> sellOrders;
         std::unordered_map<std::uint64_t, OrderLocation> orderIndex;
         std::vector<Trade> trades;
+        bool canFullyMatch(const Order& order) const;
+        void matchOrder(Order& incomingOrder);
 
     public:
         void addOrder(Order order);
         bool cancelOrder(std::uint64_t orderId);
         bool modifyOrder(std::uint64_t orderId, double newPrice, uint32_t newQuantity);
-        void matchOrder(Order& incomingOrder);
         std::size_t getTradeCount() const;
         
         void printTrades() const;

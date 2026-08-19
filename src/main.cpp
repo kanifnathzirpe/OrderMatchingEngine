@@ -10,9 +10,10 @@
 int main() {
     OrderBook book;
 
-    book.addOrder(Order(1, OrderSide::Sell, OrderType::Limit, 105.0, 100, 1));
+    book.addOrder(Order(1, OrderSide::Sell, OrderType::Limit, 100, 20, 1));
+    book.addOrder(Order(2, OrderSide::Sell, OrderType::Limit, 101, 30, 2));
 
-    book.addOrder(Order(2, OrderSide::Buy, OrderType::IOC, 100.0, 50, 2));
+    book.addOrder(Order(3, OrderSide::Buy, OrderType::FOK, 0, 50, 3));
 
     book.printOrderBook();
     book.printTrades();

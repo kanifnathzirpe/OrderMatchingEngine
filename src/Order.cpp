@@ -12,8 +12,10 @@ void Order::display() const {
         orderType = "Limit";
     else if (type == OrderType::Market)
         orderType = "Market";
-    else
+    else if(type==OrderType::IOC)
         orderType = "IOC";
+    else 
+        orderType = "FOK";
         
     std::cout<<"Order ID: " << orderId
             <<" | Side: " << (side==OrderSide::Buy? "Buy":"Sell")
